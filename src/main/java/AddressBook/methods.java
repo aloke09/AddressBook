@@ -8,6 +8,9 @@ import com.opencsv.CSVWriter;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -328,6 +331,139 @@ public class methods
             Map<String, Contact> map = gson.fromJson(reader, mapType);
             map.forEach((key, contact) -> System.out.println("Key: " + key + ", " + contact));
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void AddToDB()
+    {
+        System.out.println("Enter first name");
+        String fName=sc.next();
+        System.out.println("Enter last name");
+        String lName=sc.next();
+        System.out.println("Enter address");
+        String address=sc.next();
+        System.out.println("Enter city");
+        String city=sc.next();
+        System.out.println("Enter state");
+        String state=sc.next();
+        System.out.println("Enter email");
+        String mail=sc.next();
+        System.out.println("Enter zip");
+        int zip=sc.nextInt();
+        System.out.println("Enter phno");
+        long phno=sc.nextLong();
+        try(Connection con = DB_Connection.getCon();)
+        {
+            PreparedStatement insert = con.prepareStatement("insert into addressbook values(?,?,?,?,?,?,?,?");
+            insert.setString(1,fName);
+            insert.setString(2,lName);
+            insert.setString(3,address);
+            insert.setString(4,city);
+            insert.setString(5,state);
+            insert.setString(6,mail);
+            insert.setInt(7,zip);
+            insert.setLong(8,phno);
+            int i = insert.executeUpdate();
+            if(i>0)
+            {
+                System.out.println("Data inserted successfully!!");
+            }
+            else {
+                System.out.println("data not inserted");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+    public void DispalyAllFromDB()
+    {
+        try(Connection con = DB_Connection.getCon();)
+        {
+            PreparedStatement ps = con.prepareStatement("select * from addressbook");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next())
+            {
+                System.out.println(rs.getString(1)+" "+
+                        rs.getString(2)+" "+
+                        rs.getString(3)+" "+
+                        rs.getString(4)+" "+
+                        rs.getString(5)+" "+
+                        rs.getString(6)+" "+
+                        rs.getString(6)+" "+
+                        rs.getString(7)+" "+
+                        rs.getString(8));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public void UpdateContactFromDB()
+    {
+        System.out.println("Enter first name");
+        String fName=sc.next();
+        System.out.println("Enter last name");
+        String lName=sc.next();
+        System.out.println("Enter address");
+        String address=sc.next();
+        System.out.println("Enter city");
+        String city=sc.next();
+        System.out.println("Enter state");
+        String state=sc.next();
+        System.out.println("Enter email");
+        String mail=sc.next();
+        System.out.println("Enter zip");
+        int zip=sc.nextInt();
+        System.out.println("Enter phno");
+        long phno=sc.nextLong();
+        try(Connection con = DB_Connection.getCon())
+        {
+            PreparedStatement ps = con.prepareStatement("update addressbook set lname=?,address=?,city=?,state=?,email=?,zip=?,phno=? where fname=?");
+            ps.setString(1,lName);
+            ps.setString(2,address);
+            ps.setString(3,city);
+            ps.setString(4,state);
+            ps.setString(5,mail);
+            ps.setInt(6,zip);
+            ps.setLong(7,phno);
+            ps.setString(8,fName);
+            int i = ps.executeUpdate();
+            if(i>0)
+            {
+                System.out.println("Data updated successfully");
+            }
+            else{
+                System.out.println("Data Not updated ");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public void DelFromDB()
+    {
+        System.out.println("Enter first name");
+        String fName=sc.next();
+        try(Connection con = DB_Connection.getCon())
+        {
+            PreparedStatement ps = con.prepareStatement("delete from addressbook where fname=?");
+            ps.setString(1,fName);
+            int i = ps.executeUpdate();
+            if(i>0)
+            {
+                System.out.println("data deleted successfully");
+            }
+            else {
+                System.out.println("unsuccessful operation");
+            }
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
